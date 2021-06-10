@@ -1,13 +1,15 @@
+import 'bulmaswatch/superhero/bulmaswatch.min.css'
 import * as esbuild from 'esbuild-wasm'
 import ReactDOM from 'react-dom'
 import {useState, useEffect, useRef} from 'react'
 import {unpackagePlagin} from './plugins/unpackage-plagin'
 import {fetchPlugin} from './plugins/fetch-plugin'
+import CodeEdetor from './components/code-editor'
 
 const App = () => {
     const ref = useRef<any>()
+    const iframe = useRef<any>()
     const [input, setInput] = useState('')
-    const [code, setCode] = useState('')
 
     const startService = async () => {
         ref.current = await esbuild.startService({
@@ -20,8 +22,11 @@ const App = () => {
         startService()
     }, [])
 
-    const onClick = async () => {
+    const onClick = async (input:string) => {
         if (!ref.current) return
+
+        iframe.current.srcdoc = html
+
         const result = await ref.current.build({
             entryPoints: ['index.js'],
             bundle: true,
@@ -35,20 +40,47 @@ const App = () => {
                 global: 'window'
             }
         })
-
-        console.log(result)
-
-        setCode(result.outputFiles[0].text)
+        
+        iframe.current.contentWindow.postMessage(result.outputFiles[0].text, '*')
     }
 
+    const html = `
+        <html>
+            <head></head>
+            <body>
+                <div id="root"></div>
+            </body>
+            <script>
+                window.addEventListener('message', (event) => {
+                    try {
+                        eval(event.data)
+                    } catch(err) {
+                        const root = document.querySelector('#root')
+                        root.innerHTML = '<div style="color: red"><h4>Runtime error: </h4>' + err + '</div>'
+                        console.error(err)
+                    }
+                }, false)
+            </script>
+        </html>
+    `
     return <div>
-        <textarea value={input} onChange={e => setInput(e.target.value)}></textarea>
-        <div>
-            <button onClick={onClick}>Submit!</button>
-        </div>
-        <pre>{code}</pre>
+        <CodeEdetor 
+            initialValue="import React from 'react'"
+            onChange={value => setInput(value)}
+        /> 
+        <textarea value={input} 
+        onChange={e => {
+                onClick(e.target.value)
+                setInput(e.target.value)
+            }}>
+        </textarea>
+        <iframe title='code preview' ref={iframe} srcDoc={html} sandbox='allow-scripts'/>
     </div>
 }
+
+const html = `
+<h1>test</h1>
+`
 
 ReactDOM.render(
     <App />,
