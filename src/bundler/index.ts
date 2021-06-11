@@ -12,21 +12,30 @@ const bundler = async (rewCode:string) => {
         })
     }
 
-    const result = await service.build({
-        entryPoints: ['index.js'],
-        bundle: true,
-        write: false,
-        plugins: [
-            unpackagePlagin(),
-            fetchPlugin(rewCode)
-        ],
-        define: {
-            'process.env.NODE_ENV': '"production"',
-            global: 'window'
+    try {
+        const result = await service.build({
+            entryPoints: ['index.js'],
+            bundle: true,
+            write: false,
+            plugins: [
+                unpackagePlagin(),
+                fetchPlugin(rewCode)
+            ],
+            define: {
+                'process.env.NODE_ENV': '"production"',
+                global: 'window'
+            }
+        })
+        return {
+            code: result.outputFiles[0].text,
+            error: ''
         }
-    })
-
-    return result.outputFiles[0].text
+    } catch(err) {
+        return {
+            code: '',
+            error: err.message,
+        } 
+    }
 }
 
 export default bundler 
