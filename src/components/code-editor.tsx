@@ -1,7 +1,7 @@
 import './code-editor.css'
 import './syntax.css'
 import {useRef} from 'react'
-import MonacoEditor, {EditorDidMount, monaco} from '@monaco-editor/react'
+import MonacoEditor, {EditorDidMount} from '@monaco-editor/react'
 import prettier from 'prettier'
 import parser from 'prettier/parser-babel'
 import codeShift from 'jscodeshift'
@@ -55,7 +55,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({onChange, initialValue}) => {
             editorDidMount={onEditorDidMount}
             value={initialValue}
             language='javascript'
-            height='500px'
+            height='100%'
             theme='dark'
             options={{
                 wordWrap: 'on',
