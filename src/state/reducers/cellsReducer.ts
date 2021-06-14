@@ -1,26 +1,25 @@
-import { stat } from 'fs'
 import {produce} from 'immer'
 import { ActionTypes } from '../action-types'
 import { Action } from '../actions'
 import { Cell } from '../cell'
 
-interface CellState {
-    loading: boolean
-    error: string | null
-    order: string[]
+interface CellsState {
+    loading: boolean;
+    error: string | null;
+    order: string[];
     data: {
-        [key:string]: Cell
+        [key: string]: Cell;
     }
 }
-
-const initialState:CellState = {
+  
+const initialState: CellsState = {
     loading: false,
     error: null,
     order: [],
-    data: {}
+    data: {},
 }
 
-const cellsReducer = produce((state:CellState = initialState, action: Action) => {
+const reducer = produce((state:CellsState = initialState, action: Action) => {
     switch (action.type) {
         case ActionTypes.UPDATE_CELL: 
             const {id, content} = action.payload   
@@ -68,4 +67,4 @@ const randomId = () => {
     return Math.random().toString(36).substr(2,5)
 }
 
-export default cellsReducer
+export default reducer

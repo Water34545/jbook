@@ -29,7 +29,7 @@ export const moveCell = (id: string, direction: Directins):MoveCellAction => {
     }
 }
 
-export const inserCellBefore = (id:string, type: CellTypes):InsertCellBeforeAction => {
+export const inserCellBefore = (id:string | null, type: CellTypes):InsertCellBeforeAction => {
     return {
         type: ActionTypes.INSERT_CELL_BEFORE,
         payload: {
